@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Excel Reports</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            overflow: hidden;
+        }
+        
+        /* Animated background orbs */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.5;
+            animation: float 20s ease-in-out infinite;
+        }
+        .bg-orb-1 {
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
+        }
+        .bg-orb-2 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: -7s;
+        }
+        .bg-orb-3 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -14s;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(30px, -30px) scale(1.05); }
+            50% { transform: translate(-20px, 20px) scale(0.95); }
+            75% { transform: translate(20px, 30px) scale(1.02); }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-radius: 32px;
+            padding: 56px 48px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+            max-width: 440px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #217346 0%, #185C37 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            box-shadow: 0 8px 24px rgba(33, 115, 70, 0.4);
+        }
+        
+        .icon svg {
+            width: 32px;
+            height: 32px;
+            fill: white;
+        }
+        
+        h1 {
+            color: #fff;
+            font-size: 32px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .form-group {
+            margin-bottom: 32px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 12px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        select {
+            width: 100%;
+            padding: 18px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            font-size: 16px;
+            font-family: inherit;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='rgba(255,255,255,0.6)' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+        }
+        
+        select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+        
+        select:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.12);
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.3);
+        }
+        
+        .date-count {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 12px;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 18px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.3px;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .btn-primary:hover:not(:disabled)::before {
+            opacity: 1;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.5);
+        }
+        
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        .btn-primary span {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status {
+            margin-top: 24px;
+            padding: 18px;
+            border-radius: 16px;
+            text-align: center;
+            font-size: 15px;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status.loading {
+            display: block;
+            background: rgba(102, 126, 234, 0.2);
+            color: #fff;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+        
+        .status.success {
+            display: block;
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+        
+        .status.error {
+            display: block;
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff4757;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+    
+    <div class="container">
+        <div class="icon">
+            <!-- Microsoft Excel Logo -->
+            <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                <path d="M28.781 4.405h-10.13V0.69L0 2.87v26.27l18.651 2.17V26.1h10.13a1.23 1.23 0 001.22-1.22V5.625a1.23 1.23 0 00-1.22-1.22zM8.57 20.56L5.63 15l2.94-5.56h2.56l-2.8 5.56l2.8 5.56zm10.08 4.76h-5.22v-1.85h5.22zm0-3.41h-5.22v-1.85h5.22zm0-3.41h-5.22v-1.85h5.22zm0-3.41h-5.22v-1.85h5.22zm0-3.41h-5.22V9.77h5.22zm9.35 13.64h-7.22v-1.85h7.22zm0-3.41h-7.22v-1.85h7.22zm0-3.41h-7.22v-1.85h7.22zm0-3.41h-7.22v-1.85h7.22zm0-3.41h-7.22V9.77h7.22z" fill="white"/>
+            </svg>
+        </div>
+        
+        <h1>Student Reports</h1>
+        
+        <div class="form-group">
+            <label for="testDate">Select Test Date</label>
+            <select id="testDate">
+                <option value="">Loading dates...</option>
+            </select>
+            <p class="date-count" id="dateInfo"></p>
+        </div>
+        
+        <button type="button" class="btn-primary" id="downloadBtn" onclick="downloadReport()">
+            <span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+                Download Report
+            </span>
+        </button>
+        
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        const API_BASE = '/api/reports';
+        const CONTEST_ID = 178;
+        
+        document.addEventListener('DOMContentLoaded', loadTestDates);
+        
+        async function loadTestDates() {
+            try {
+                const response = await fetch(`${API_BASE}/test-dates/${CONTEST_ID}`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Failed to load dates');
+                }
+                
+                const select = document.getElementById('testDate');
+                select.innerHTML = '<option value="">Choose a date...</option>';
+                
+                data.test_dates.forEach(date => {
+                    const option = document.createElement('option');
+                    option.value = date;
+                    option.textContent = formatDate(date);
+                    select.appendChild(option);
+                });
+                
+                document.getElementById('dateInfo').textContent = `${data.total_dates} test dates available`;
+                
+            } catch (error) {
+                showStatus(error.message, 'error');
+            }
+        }
+        
+        async function downloadReport() {
+            const testDate = document.getElementById('testDate').value;
+            
+            if (!testDate) {
+                showStatus('Please select a test date first', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('downloadBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span><span class="spinner"></span>Generating...</span>';
+            
+            try {
+                const url = `${API_BASE}/student-responses?contest_id=${CONTEST_ID}&test_date=${testDate}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.detail || 'Failed to generate report');
+                }
+                
+                const disposition = response.headers.get('Content-Disposition');
+                let filename = `report_${testDate}.xlsx`;
+                if (disposition) {
+                    const match = disposition.match(/filename=(.+)/);
+                    if (match) filename = match[1];
+                }
+                
+                const blob = await response.blob();
+                const downloadUrl = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(downloadUrl);
+                document.body.removeChild(a);
+                
+                showStatus('Done!', 'success');
+                
+            } catch (error) {
+                showStatus(error.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                    </svg>
+                    Download Report
+                </span>`;
+            }
+        }
+        
+        function formatDate(dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'short', 
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.className = 'status ' + type;
+            status.textContent = message;
+            
+            if (type === 'success') {
+                setTimeout(() => { status.className = 'status'; }, 2000);
+            }
+        }
+    </script>
+</body>
+</html>
