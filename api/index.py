@@ -49,8 +49,8 @@ app.add_middleware(
 # Include routers
 app.include_router(reports_router)
 
-# Get the directory where main.py is located
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# Get the directory where the project root is
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 
 
